@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@import "@fontsource-variable/jetbrains-mono";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -81,6 +82,8 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
 }
 
 .dark {
@@ -120,11 +123,162 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
-    }
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
   html {
     @apply font-sans;
+  }
+  code, pre, .font-mono {
+    font-family: "JetBrains Mono", monospace;
+  }
+}
+@media print {
+  body {
+    margin: 0;
+    background: white;
+  }
+  .no-print,
+  button {
+    display: none !important;
+  }
+  /* Hide layout */
+  aside,
+  nav,
+  header {
+    display: none !important;
+  }
+  @media print {
+    /* 🔥 Apply only to this section */
+    .print-compact {
+      display: block !important;
+      padding: 8px !important;
     }
+  
+    .print-compact > div {
+      width: 100% !important;
+      margin-bottom: 10px !important;
+    }
+  
+    /* Cards */
+    .print-compact .border-slate-200 {
+      padding: 8px !important;
+      margin-bottom: 10px !important;
+      break-inside: avoid;
+    }
+  
+    /* CardHeader */
+    .print-compact .pt-5 {
+      padding-top: 6px !important;
+    }
+  
+    .print-compact .pb-2 {
+      padding-bottom: 4px !important;
+    }
+  
+    /* CardContent */
+    .print-compact .px-5 {
+      padding-left: 8px !important;
+      padding-right: 8px !important;
+    }
+  
+    .print-compact .pb-5 {
+      padding-bottom: 8px !important;
+    }
+  
+    /* Vitals grid */
+    .print-compact .grid-cols-4 {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 6px !important;
+    }
+  
+    .print-compact .grid-cols-4 > div {
+      padding: 6px !important;
+    }
+  
+    /* Typography */
+    .print-compact .text-lg {
+      font-size: 14px !important;
+    }
+  
+    .print-compact .text-sm {
+      font-size: 11px !important;
+    }
+  
+    .print-compact .text-xs {
+      font-size: 10px !important;
+    }
+  
+    /* Gaps */
+    .print-compact .gap-4 {
+      gap: 8px !important;
+    }
+  
+    .print-compact .gap-3 {
+      gap: 6px !important;
+    }
+  
+    .print-compact .gap-2 {
+      gap: 4px !important;
+    }
+  
+    /* Rows */
+    .print-compact .p-3 {
+      padding: 6px !important;
+    }
+  
+    .print-compact .pb-4 {
+      padding-bottom: 6px !important;
+    }
+      .vitals-grid {
+        display: grid !important;
+        /* 👇 FORCE all in one row */
+        grid-template-columns: repeat(6, 1fr) !important;
+    
+        gap: 6px !important;
+      }
+    
+      .vitals-grid > div {
+        padding: 6px !important;
+      }
+    
+      /* Compact text */
+      .vitals-grid .text-lg {
+        font-size: 13px !important;
+      }
+    
+      .vitals-grid .text-xs {
+        font-size: 9px !important;
+      }
+  }
+  /* Show only content */
+  .print-main {
+    position: static;
+    width: 100%;
+    padding: 16px;
+  }
+
+  /* Fix grid layout */
+  .grid {
+    display: block !important;
+  }
+
+  .grid > * {
+    width: 100% !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* Prevent card breaking */
+  .border-slate-200 {
+    break-inside: avoid;
+  }
+
+  /* Slight spacing control (NOT aggressive) */
+  .print-main .flex {
+    gap: 8px !important;
+  }
 }

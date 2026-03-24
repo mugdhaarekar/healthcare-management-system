@@ -1,121 +1,176 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { onAuthChange } from "./lib/firebase";
+import { setUser, setLoading } from "./store/authSlice";
+import { useAppSelector } from "./hooks/useAuth";
+import type { AppDispatch } from "./store/store";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Analytics from "./pages/Analytics";
+import Patients from "./pages/patients/Patients";
+import PatientDetail from "./pages/patients/PatientDetail";
+import Sidebar from "./components/shared/Sidebar";
+import Topbar from "./components/shared/Topbar";
 
-function App() {
-  const [count, setCount] = useState(0)
+const routeMeta: Record<string, { title: string; subtitle?: string }> = {
+  "/dashboard": { title: "Dashboard", subtitle: "Ward 3 Overview" },
+  "/analytics": { title: "Analytics", subtitle: "Clinical performance · Mar 2026" },
+  "/patients": { title: "Patients", subtitle: "Manage patient records" },
+  "/appointments": { title: "Appointments", subtitle: "Today's schedule" },
+  "/notifications": { title: "Notifications", subtitle: "Recent alerts" },
+  "/team": { title: "Team", subtitle: "Manage your clinical team" },
+  "/settings": { title: "Settings", subtitle: "App preferences" },
+};
+
+function ProtectedLayout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  const { user } = useAppSelector((state) => state.auth);
+
+  const isPatientDetail = location.pathname.startsWith("/patients/") &&
+    location.pathname !== "/patients";
+
+  const meta = isPatientDetail
+    ? { title: "Patient Detail", subtitle: "Full clinical record" }
+    : routeMeta[location.pathname] ?? { title: "MediNexus" };
+
+  const greeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
+  };
+
+  const name = user?.displayName?.split(" ")[0] ?? "Doctor";
+
+  const finalTitle = location.pathname === "/dashboard"
+    ? `${greeting()}, ${name}`
+    : meta.title;
+
+  const finalSubtitle = location.pathname === "/dashboard"
+    ? new Date().toLocaleDateString("en-IN", {
+        weekday: "short",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : meta.subtitle;
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Topbar title={finalTitle} subtitle={finalSubtitle} />
+        <div className="flex-1 overflow-hidden">
+          {children}
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      </div>
+    </div>
+  );
 }
 
-export default App
+function AppRoutes() {
+  const { user, loading } = useAppSelector((state) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(setLoading(true));
+    const unsubscribe = onAuthChange((firebaseUser) => {
+      if (firebaseUser) {
+        dispatch(
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+            photoURL: firebaseUser.photoURL,
+          })
+        );
+      } else {
+        dispatch(setUser(null));
+      }
+    });
+    return () => unsubscribe();
+  }, [dispatch]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-slate-50 dark:bg-slate-950">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
+            Loading MediNexus...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route
+        path="/login"
+        element={user ? <Navigate to="/dashboard" replace /> : <Login />}
+      />
+      <Route
+        path="/dashboard"
+        element={
+          user ? (
+            <ProtectedLayout><Dashboard /></ProtectedLayout>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path="/analytics"
+        element={
+          user ? (
+            <ProtectedLayout><Analytics /></ProtectedLayout>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path="/patients"
+        element={
+          user ? (
+            <ProtectedLayout><Patients /></ProtectedLayout>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path="/patients/:id"
+        element={
+          user ? (
+            <ProtectedLayout><PatientDetail /></ProtectedLayout>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path="*"
+        element={<Navigate to={user ? "/dashboard" : "/login"} replace />}
+      />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppRoutes />
+    </Router>
+  );
+}
+
+export default App;
