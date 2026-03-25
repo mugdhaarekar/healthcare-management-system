@@ -18,15 +18,14 @@ import Patients from "./pages/patients/Patients";
 import PatientDetail from "./pages/patients/PatientDetail";
 import Sidebar from "./components/shared/Sidebar";
 import Topbar from "./components/shared/Topbar";
+import { useNotifications } from "./hooks/useNotifications";
+import { useAppointmentNotifications } from "./hooks/useAppointmentNotifications";
+import { Toaster } from "sonner";
 
 const routeMeta: Record<string, { title: string; subtitle?: string }> = {
   "/dashboard": { title: "Dashboard", subtitle: "Ward 3 Overview" },
   "/analytics": { title: "Analytics", subtitle: "Clinical performance · Mar 2026" },
   "/patients": { title: "Patients", subtitle: "Manage patient records" },
-  "/appointments": { title: "Appointments", subtitle: "Today's schedule" },
-  "/notifications": { title: "Notifications", subtitle: "Recent alerts" },
-  "/team": { title: "Team", subtitle: "Manage your clinical team" },
-  "/settings": { title: "Settings", subtitle: "App preferences" },
 };
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
@@ -67,6 +66,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Topbar title={finalTitle} subtitle={finalSubtitle} />
+        <Toaster position="top-right" richColors closeButton />
         <div className="flex-1 overflow-hidden">
           {children}
         </div>
@@ -87,16 +87,18 @@ function AppRoutes() {
           setUser({
             uid: firebaseUser.uid,
             email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
-            photoURL: firebaseUser.photoURL,
+            displayName: firebaseUser.displayName
           })
         );
       } else {
         dispatch(setUser(null));
       }
+      dispatch(setLoading(false)); 
     });
     return () => unsubscribe();
   }, [dispatch]);
+  useNotifications();
+  useAppointmentNotifications();
 
   if (loading) {
     return (

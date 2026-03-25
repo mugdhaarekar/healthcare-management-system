@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { Bell, X, AlertCircle, Calendar, Pill, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { notifications } from "@/data/mockData";
+import type { ActivityType } from "@/data/mockData";
+import { toast } from "sonner";
 import {
   sendCriticalAlert,
   sendAppointmentReminder,
   sendMedicationReminder,
+  sendLabResultNotification,
   requestNotificationPermission,
 } from "../../lib/notifications";
-import type { ActivityType } from "@/data/mockData";
-import { activities } from "@/data/mockData";
 import { useNavigate } from "react-router-dom";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -18,91 +20,41 @@ const iconMap: Record<string, React.ReactNode> = {
   appointment: <Calendar className="w-4 h-4 text-purple-500" />,
 };
 
-const bgMap: Record<string, string> = {
-  critical: "bg-red-50 dark:bg-red-950/40 border-red-100 dark:border-red-900",
-  warning: "bg-amber-50 dark:bg-amber-950/40 border-amber-100 dark:border-amber-900",
-  info: "bg-blue-50 dark:bg-blue-950/40 border-blue-100 dark:border-blue-900",
-  appointment: "bg-purple-50 dark:bg-purple-950/40 border-purple-100 dark:border-purple-900",
-};
-
-
-
 export default function NotificationPanel() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [permitted, setPermitted] = useState(
-    typeof Notification !== "undefined" && Notification.permission === "granted"
+    typeof Notification !== "undefined" &&
+      Notification.permission === "granted"
   );
-  const navigate = useNavigate();
-  const [notifications, setNotifications] = useState<ActivityType[]>(() => {
-    if (typeof window === "undefined") {
-      return activities.filter((item) => item.category === "notification");
-    }
-  
+  const [items, setItems] = useState<ActivityType[]>(() => {
+    if (typeof window === "undefined") return notifications;
     const saved = localStorage.getItem("notifications");
-    const data: ActivityType[] = saved
-      ? JSON.parse(saved)
-      : activities;
-  
-    return data.filter((item) => item.category === "notification");
+    return saved ? JSON.parse(saved) : notifications;
   });
-  const unreadCount: number = notifications.filter((n) => !n.read).length;
+  const unreadCount = items.filter((n) => !n.read).length;
   const handleEnable = async () => {
     const granted = await requestNotificationPermission();
     setPermitted(granted);
   };
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("notifications", JSON.stringify(notifications));
-    }
-  }, [notifications]);
 
   const markAllRead = () => {
-    setNotifications((prev) =>
-      prev.map((n) => ({ ...n, read: true }))
-    );
-  };
-  const handleNotificationClick = (n: ActivityType) => {
-    setNotifications((prev) =>
-      prev.map((item) =>
-        item.id === n.id ? { ...item, read: true } : item
-      )
-    );
-  
-    setTimeout(() => {
-      setNotifications((prev) =>
-        prev.filter((item) => item.id !== n.id)
-      );
-    }, 300);
-  
-    if (n.redirectUrl) {
-      navigate(n.redirectUrl);
-    }
-  
-    setOpen(false);
+    setItems([])
   };
 
-  const testNotifications = [
-    {
-      label: "Critical patient alert",
-      color: "bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400",
-      action: () => sendCriticalAlert("Rahul Mehta", "SpO₂ dropped to 88%. Immediate attention required."),
-    },
-    {
-      label: "Appointment reminder",
-      color: "bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400",
-      action: () => sendAppointmentReminder("Ayesha Khan", "10:30 AM"),
-    },
-    {
-      label: "Medication reminder",
-      color: "bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400",
-      action: () => sendMedicationReminder("Vijay Sharma"),
-    },
-  ];
+  const markRead = (id: string) => {
+    setItems((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    );
+  };
+  useEffect(() => {
+    localStorage.setItem("notifications", JSON.stringify(items));
+  }, [items]);
 
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => setOpen((prev) => !prev)}
         className="relative w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
       >
         <Bell className="w-4 h-4" />
@@ -149,12 +101,15 @@ export default function NotificationPanel() {
               </div>
             </div>
 
-            <div className="max-h-64 overflow-y-auto">
-              {notifications.map((n) => (
+            <div className="max-h-56 overflow-y-auto">
+              {items.map((n) => (
                 <div
                   key={n.id}
-                  onClick={() => handleNotificationClick(n)}
-                  className={`flex items-start gap-3 px-4 py-3 border-b border-slate-50 dark:border-slate-800 transition-colors ${
+                  onClick={() => {
+                    markRead(n.id);
+                    if (n.redirectUrl) navigate(n.redirectUrl);
+                  }}                  
+                  className={`flex items-start gap-3 px-4 py-3 border-b border-slate-50 dark:border-slate-800 cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 ${
                     !n.read ? "bg-slate-50 dark:bg-slate-800/50" : ""
                   }`}
                 >
@@ -166,7 +121,7 @@ export default function NotificationPanel() {
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
                       {n.message}
                     </p>
-                    <p className="text-[10px] text-slate-400 font-mono mt-1">
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono mt-1">
                       {n.time}
                     </p>
                   </div>
@@ -197,18 +152,25 @@ export default function NotificationPanel() {
                 Test push notifications
               </p>
               <div className="flex flex-col gap-1.5">
-                {testNotifications.map((t) => (
                   <button
-                    key={t.label}
                     onClick={() => {
-                      t.action();
-                      setOpen(false);
+                        const newItem: ActivityType = {
+                          id: Date.now().toString(),
+                          type: "info",
+                          category: "notification",
+                          title: "Test Alert",
+                          message: "Triggered manually",
+                          time: new Date().toLocaleTimeString(),
+                          read: false,
+                        };
+                        toast.info("Test Alert sent");
+                        setItems((prev) => [newItem, ...prev]);
+                        setOpen(false);
                     }}
-                    className={`w-full text-left px-3 py-2 rounded-lg border text-xs font-semibold transition-all hover:opacity-80 ${t.color}`}
+                    className={`w-full text-left px-3 py-2 rounded-lg border text-xs font-semibold transition-all hover:opacity-80`}
                   >
-                    {t.label}
+                    Test Notification
                   </button>
-                ))}
               </div>
             </div>
           </div>

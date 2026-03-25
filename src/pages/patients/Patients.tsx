@@ -13,7 +13,6 @@ import {
   LayoutGrid,
   List,
   Search,
-  Filter,
   Plus,
   Heart,
   Thermometer,
@@ -24,17 +23,17 @@ import { useTopbar } from "@/hooks/useTopbar";
 import AddModal from "@/components/shared/AddModal";
 
 const statusStyles: Record<string, string> = {
-  Critical: "bg-red-100 text-red-700 border-red-200",
-  Stable: "bg-green-100 text-green-700 border-green-200",
-  Observation: "bg-amber-100 text-amber-700 border-amber-200",
-  Discharged: "bg-slate-100 text-slate-500 border-slate-200",
+  Critical: "bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900",
+  Stable: "bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 border-green-200 dark:border-green-900",
+  Observation: "bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900",
+  Discharged: "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700",
 };
 
 const avatarColors: Record<string, string> = {
-  Critical: "bg-red-100 text-red-700",
-  Stable: "bg-green-100 text-green-700",
-  Observation: "bg-amber-100 text-amber-700",
-  Discharged: "bg-slate-100 text-slate-500",
+  Critical: "bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-400",
+  Stable: "bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400",
+  Observation: "bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400",
+  Discharged: "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400",
 };
 
 const filters = ["All", "Critical", "Stable", "Observation", "Discharged"];
@@ -46,7 +45,7 @@ function getInitials(name: string) {
 function GridCard({ patient, onClick }: { patient: Patient; onClick: () => void }) {
   return (
     <Card
-      className="border-slate-200 cursor-pointer hover:border-blue-300 hover:shadow-sm transition-all"
+      className="border-slate-200 dark:border-slate-700 dark:bg-slate-900 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-sm transition-all"
       onClick={onClick}
     >
       <CardContent className="p-5">
@@ -55,8 +54,12 @@ function GridCard({ patient, onClick }: { patient: Patient; onClick: () => void 
             {getInitials(patient.name)}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-bold text-slate-900 truncate">{patient.name}</p>
-            <p className="text-xs text-slate-400 font-mono">{patient.id} · {patient.gender} · {patient.age}yr</p>
+            <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+              {patient.name}
+            </p>
+            <p className="text-xs text-slate-400 dark:text-slate-500 font-mono">
+              {patient.id} · {patient.gender} · {patient.age}yr
+            </p>
           </div>
         </div>
 
@@ -65,39 +68,41 @@ function GridCard({ patient, onClick }: { patient: Patient; onClick: () => void 
         </Badge>
 
         <div className="grid grid-cols-2 gap-2">
-          <div className="bg-slate-50 rounded-lg p-2.5">
+          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-2.5">
             <div className="flex items-center gap-1 mb-1">
               <Activity className="w-3 h-3 text-slate-400" />
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">SpO₂</span>
             </div>
-            <p className={`text-base font-bold font-mono ${patient.vitals.spo2 < 90 ? "text-red-500" : "text-slate-900"}`}>
+            <p className={`text-base font-bold font-mono ${patient.vitals.spo2 < 90 ? "text-red-500" : "text-slate-900 dark:text-slate-100"}`}>
               {patient.vitals.spo2}%
             </p>
           </div>
-          <div className="bg-slate-50 rounded-lg p-2.5">
+          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-2.5">
             <div className="flex items-center gap-1 mb-1">
               <Heart className="w-3 h-3 text-slate-400" />
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">BP</span>
             </div>
-            <p className="text-base font-bold font-mono text-slate-900">
+            <p className="text-base font-bold font-mono text-slate-900 dark:text-slate-100">
               {patient.vitals.bloodPressure}
             </p>
           </div>
-          <div className="bg-slate-50 rounded-lg p-2.5">
+          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-2.5">
             <div className="flex items-center gap-1 mb-1">
               <Activity className="w-3 h-3 text-slate-400" />
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">HR</span>
             </div>
-            <p className="text-base font-bold font-mono text-slate-900">
+            <p className="text-base font-bold font-mono text-slate-900 dark:text-slate-100">
               {patient.vitals.heartRate}
             </p>
           </div>
-          <div className="bg-slate-50 rounded-lg p-2.5">
+          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-2.5">
             <div className="flex items-center gap-1 mb-1">
               <Thermometer className="w-3 h-3 text-slate-400" />
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ward</span>
             </div>
-            <p className="text-sm font-bold text-slate-900 truncate">{patient.ward}</p>
+            <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+              {patient.ward}
+            </p>
           </div>
         </div>
       </CardContent>
@@ -108,7 +113,7 @@ function GridCard({ patient, onClick }: { patient: Patient; onClick: () => void 
 function ListRow({ patient, onClick }: { patient: Patient; onClick: () => void }) {
   return (
     <div
-      className="grid items-center gap-4 px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors border-b border-slate-100 last:border-0"
+      className="grid items-center gap-4 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors border-b border-slate-100 dark:border-slate-800 last:border-0"
       style={{ gridTemplateColumns: "2fr 1.5fr 1fr 1fr 0.8fr 0.8fr 0.8fr" }}
       onClick={onClick}
     >
@@ -117,22 +122,34 @@ function ListRow({ patient, onClick }: { patient: Patient; onClick: () => void }
           {getInitials(patient.name)}
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-bold text-slate-900 truncate">{patient.name}</p>
-          <p className="text-xs text-slate-400 font-mono">{patient.id}</p>
+          <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+            {patient.name}
+          </p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 font-mono">
+            {patient.id}
+          </p>
         </div>
       </div>
-      <div className="text-sm text-slate-600 font-medium truncate">{patient.diagnosis}</div>
+      <div className="text-sm text-slate-600 dark:text-slate-300 font-medium truncate">
+        {patient.diagnosis}
+      </div>
       <div>
         <Badge className={`text-[10px] font-bold ${statusStyles[patient.status]}`}>
           {patient.status}
         </Badge>
       </div>
-      <div className="text-sm font-mono text-slate-600">{patient.ward}</div>
-      <div className={`text-sm font-bold font-mono ${patient.vitals.spo2 < 90 ? "text-red-500" : "text-slate-700"}`}>
+      <div className="text-sm font-mono text-slate-600 dark:text-slate-300">
+        {patient.ward}
+      </div>
+      <div className={`text-sm font-bold font-mono ${patient.vitals.spo2 < 90 ? "text-red-500" : "text-slate-700 dark:text-slate-300"}`}>
         {patient.vitals.spo2}%
       </div>
-      <div className="text-sm font-mono text-slate-600">{patient.vitals.bloodPressure}</div>
-      <div className="text-sm font-mono text-slate-600">{patient.vitals.heartRate}</div>
+      <div className="text-sm font-mono text-slate-600 dark:text-slate-300">
+        {patient.vitals.bloodPressure}
+      </div>
+      <div className="text-sm font-mono text-slate-600 dark:text-slate-300">
+        {patient.vitals.heartRate}
+      </div>
     </div>
   );
 }
@@ -155,7 +172,7 @@ export default function Patients() {
             placeholder="Search patients..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 h-9 w-48 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm"
+            className="pl-9 h-9 w-48 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm dark:text-slate-100"
           />
         </div>
         <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1 gap-1">
@@ -212,70 +229,79 @@ export default function Patients() {
 
   return (
     <>
-        <div className="flex flex-col h-full overflow-hidden">
-      <div className="px-6 py-3 bg-white border-b border-slate-100 flex gap-2 shrink-0 flex-wrap">
-        {filters.map((f) => (
-          <button
-            key={f}
-            onClick={() => setActiveFilter(f)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
-              activeFilter === f
-                ? "bg-blue-50 text-blue-700 border-blue-200"
-                : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
-            }`}
-          >
-            {f}
-            <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${activeFilter === f ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-400"}`}>
-              {counts[f as keyof typeof counts]}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-6">
-        {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 gap-2">
-            <Search className="w-8 h-8 text-slate-300" />
-            <p className="text-sm font-semibold text-slate-400">No patients found</p>
-            <p className="text-xs text-slate-300">Try adjusting your search or filter</p>
-          </div>
-        ) : viewMode === "grid" ? (
-          <div className="grid grid-cols-3 gap-4">
-            {filtered.map((patient) => (
-              <GridCard
-                key={patient.id}
-                patient={patient}
-                onClick={() => navigate(`/patients/${patient.id}`)}
-              />
-            ))}
-          </div>
-        ) : (
-          <Card className="border-slate-200">
-            <div
-              className="grid px-4 py-2.5 border-b border-slate-100 bg-slate-50 rounded-t-lg"
-              style={{ gridTemplateColumns: "2fr 1.5fr 1fr 1fr 0.8fr 0.8fr 0.8fr" }}
+      <div className="flex flex-col h-full overflow-hidden">
+        <div className="px-6 py-3 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex gap-2 shrink-0 flex-wrap">
+          {filters.map((f) => (
+            <button
+              key={f}
+              onClick={() => setActiveFilter(f)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                activeFilter === f
+                  ? "bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800"
+                  : "bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+              }`}
             >
-              {["Patient", "Diagnosis", "Status", "Ward", "SpO₂", "BP", "HR"].map((h) => (
-                <div key={h} className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  {h}
-                </div>
+              {f}
+              <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                activeFilter === f
+                  ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-400"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500"
+              }`}>
+                {counts[f as keyof typeof counts]}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 bg-slate-50 dark:bg-slate-950">
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-48 gap-2">
+              <Search className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+              <p className="text-sm font-semibold text-slate-400 dark:text-slate-500">
+                No patients found
+              </p>
+              <p className="text-xs text-slate-300 dark:text-slate-600">
+                Try adjusting your search or filter
+              </p>
+            </div>
+          ) : viewMode === "grid" ? (
+            <div className="grid grid-cols-3 gap-4">
+              {filtered.map((patient) => (
+                <GridCard
+                  key={patient.id}
+                  patient={patient}
+                  onClick={() => navigate(`/patients/${patient.id}`)}
+                />
               ))}
             </div>
-            {filtered.map((patient) => (
-              <ListRow
-                key={patient.id}
-                patient={patient}
-                onClick={() => navigate(`/patients/${patient.id}`)}
-              />
-            ))}
-          </Card>
-        )}
+          ) : (
+            <Card className="border-slate-200 dark:border-slate-700 dark:bg-slate-900">
+              <div
+                className="grid px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 rounded-t-lg"
+                style={{ gridTemplateColumns: "2fr 1.5fr 1fr 1fr 0.8fr 0.8fr 0.8fr" }}
+              >
+                {["Patient", "Diagnosis", "Status", "Ward", "SpO₂", "BP", "HR"].map((h) => (
+                  <div key={h} className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    {h}
+                  </div>
+                ))}
+              </div>
+              {filtered.map((patient) => (
+                <ListRow
+                  key={patient.id}
+                  patient={patient}
+                  onClick={() => navigate(`/patients/${patient.id}`)}
+                />
+              ))}
+            </Card>
+          )}
+        </div>
       </div>
-    </div>
-    <AddModal
-      open={showAddModal}
-      onClose={() => setShowAddModal(false)}
-    />
+
+      <AddModal
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+      />
     </>
   );
 }

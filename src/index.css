@@ -153,132 +153,44 @@
     display: none !important;
   }
   @media print {
-    /* 🔥 Apply only to this section */
-    .print-compact {
-      display: block !important;
-      padding: 8px !important;
+    body * {
+      visibility: hidden;
     }
   
-    .print-compact > div {
-      width: 100% !important;
-      margin-bottom: 10px !important;
+    .print-main,
+    .print-main * {
+      visibility: visible;
     }
   
-    /* Cards */
-    .print-compact .border-slate-200 {
-      padding: 8px !important;
-      margin-bottom: 10px !important;
+    .print-main {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      overflow: visible !important;
+      padding: 16px;
+    }  
+    .print-main {
+      height: auto !important;
+      max-height: none !important;
+    }
+    button,
+    [role="button"] {
+      display: none !important;
+    }
+    .print-main .border-slate-200 {
       break-inside: avoid;
+      page-break-inside: avoid;
     }
   
-    /* CardHeader */
-    .print-compact .pt-5 {
-      padding-top: 6px !important;
+    .print-main .grid-cols-3 {
+      display: block;
     }
   
-    .print-compact .pb-2 {
-      padding-bottom: 4px !important;
+    .print-main .col-span-2,
+    .print-main .grid-cols-3 > div {
+      width: 100%;
+      margin-bottom: 16px;
     }
-  
-    /* CardContent */
-    .print-compact .px-5 {
-      padding-left: 8px !important;
-      padding-right: 8px !important;
-    }
-  
-    .print-compact .pb-5 {
-      padding-bottom: 8px !important;
-    }
-  
-    /* Vitals grid */
-    .print-compact .grid-cols-4 {
-      grid-template-columns: repeat(2, 1fr) !important;
-      gap: 6px !important;
-    }
-  
-    .print-compact .grid-cols-4 > div {
-      padding: 6px !important;
-    }
-  
-    /* Typography */
-    .print-compact .text-lg {
-      font-size: 14px !important;
-    }
-  
-    .print-compact .text-sm {
-      font-size: 11px !important;
-    }
-  
-    .print-compact .text-xs {
-      font-size: 10px !important;
-    }
-  
-    /* Gaps */
-    .print-compact .gap-4 {
-      gap: 8px !important;
-    }
-  
-    .print-compact .gap-3 {
-      gap: 6px !important;
-    }
-  
-    .print-compact .gap-2 {
-      gap: 4px !important;
-    }
-  
-    /* Rows */
-    .print-compact .p-3 {
-      padding: 6px !important;
-    }
-  
-    .print-compact .pb-4 {
-      padding-bottom: 6px !important;
-    }
-      .vitals-grid {
-        display: grid !important;
-        /* 👇 FORCE all in one row */
-        grid-template-columns: repeat(6, 1fr) !important;
-    
-        gap: 6px !important;
-      }
-    
-      .vitals-grid > div {
-        padding: 6px !important;
-      }
-    
-      /* Compact text */
-      .vitals-grid .text-lg {
-        font-size: 13px !important;
-      }
-    
-      .vitals-grid .text-xs {
-        font-size: 9px !important;
-      }
-  }
-  /* Show only content */
-  .print-main {
-    position: static;
-    width: 100%;
-    padding: 16px;
-  }
-
-  /* Fix grid layout */
-  .grid {
-    display: block !important;
-  }
-
-  .grid > * {
-    width: 100% !important;
-    margin-bottom: 16px !important;
-  }
-
-  /* Prevent card breaking */
-  .border-slate-200 {
-    break-inside: avoid;
-  }
-
-  /* Slight spacing control (NOT aggressive) */
-  .print-main .flex {
-    gap: 8px !important;
   }
 }

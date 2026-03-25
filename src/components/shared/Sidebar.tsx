@@ -18,13 +18,6 @@ const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { label: "Patients", path: "/patients", icon: Users, badge: "248" },
   { label: "Analytics", path: "/analytics", icon: BarChart3 },
-  { label: "Appointments", path: "/appointments", icon: CalendarDays, badge: "18" },
-  { label: "Notifications", path: "/notifications", icon: Bell, badge: "5" },
-];
-
-const manageItems = [
-  { label: "Team", path: "/team", icon: UserCheck },
-  { label: "Settings", path: "/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
@@ -92,28 +85,6 @@ export default function Sidebar() {
           );
         })}
 
-        <p className="px-4 pb-2 pt-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-          Manage
-        </p>
-
-        {manageItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.path);
-          return (
-            <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className={`flex items-center gap-2 mx-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all mb-0.5 ${
-                active
-                  ? "bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400"
-                  : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
-              }`}
-            >
-              <Icon className={`w-4 h-4 shrink-0 ${active ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-slate-500"}`} />
-              <span className="flex-1 text-left">{item.label}</span>
-            </button>
-          );
-        })}
       </div>
 
       <div className="border-t border-slate-100 dark:border-slate-800 p-3">

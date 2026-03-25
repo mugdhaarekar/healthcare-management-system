@@ -5,6 +5,7 @@ import {
   loginWithEmail,
   loginWithGoogle,
   logout,
+  registerWithEmail,
 } from "../lib/firebase";
 
 export const loginWithEmailThunk = createAsyncThunk(
@@ -19,7 +20,6 @@ export const loginWithEmailThunk = createAsyncThunk(
         uid: result.user.uid,
         email: result.user.email,
         displayName: result.user.displayName,
-        photoURL: result.user.photoURL,
       };
       return user;
     } catch (error: unknown) {
@@ -27,6 +27,29 @@ export const loginWithEmailThunk = createAsyncThunk(
         return rejectWithValue(error.message);
       }
       return rejectWithValue("Login failed");
+    }
+  }
+);
+
+export const registerWithEmailThunk = createAsyncThunk(
+  "auth/registerWithEmail",
+  async (
+    { email, password }: { email: string; password: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const result = await registerWithEmail(email, password);
+      const user: User = {
+        uid: result.user.uid,
+        email: result.user.email,
+        displayName: result.user.displayName,
+      };
+      return user;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("Registration failed");
     }
   }
 );
@@ -40,7 +63,6 @@ export const loginWithGoogleThunk = createAsyncThunk(
         uid: result.user.uid,
         email: result.user.email,
         displayName: result.user.displayName,
-        photoURL: result.user.photoURL,
       };
       return user;
     } catch (error: unknown) {
@@ -100,6 +122,19 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginWithEmailThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(registerWithEmailThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerWithEmailThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.error = null;
+      })
+      .addCase(registerWithEmailThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
