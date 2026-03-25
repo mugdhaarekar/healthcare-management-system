@@ -1,9 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import {
-  Users,
-  CalendarDays,
-  AlertTriangle,
-  BedDouble,
   TrendingUp,
   TrendingDown,
   ArrowRight,

@@ -32,8 +32,6 @@ export async function sendLocalNotification(
       icon: "/vite.svg",
       badge: "/vite.svg",
       tag: tag ?? title,
-      renotify: true,
-      vibrate: [200, 100, 200],
     });
   } else {
     new Notification(title, { body, icon: "/vite.svg" });

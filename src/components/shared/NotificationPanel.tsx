@@ -5,10 +5,6 @@ import { notifications } from "@/data/mockData";
 import type { ActivityType } from "@/data/mockData";
 import { toast } from "sonner";
 import {
-  sendCriticalAlert,
-  sendAppointmentReminder,
-  sendMedicationReminder,
-  sendLabResultNotification,
   requestNotificationPermission,
 } from "../../lib/notifications";
 import { useNavigate } from "react-router-dom";

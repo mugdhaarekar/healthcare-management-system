@@ -4,10 +4,6 @@ import {
   LayoutDashboard,
   Users,
   BarChart3,
-  CalendarDays,
-  Bell,
-  UserCheck,
-  Settings,
   LogOut,
 } from "lucide-react";
 import { logoutThunk } from "../../store/authSlice";
