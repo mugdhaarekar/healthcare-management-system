@@ -8,6 +8,27 @@ import {
   registerWithEmail,
 } from "../lib/firebase";
 
+const mapAuthErrorMessage = (error: unknown, fallbackMessage: string) => {
+  if (!(error instanceof Error)) {
+    return fallbackMessage;
+  }
+
+  const message = error.message;
+
+  if (message.includes("INVALID_IDP_RESPONSE") || message.includes("invalid_client")) {
+    return "Google sign-in is not configured correctly in Firebase/Google Cloud (invalid_client). Verify OAuth client, authorized redirect URI, and enabled Google provider.";
+  }
+
+  if (message.includes("auth/popup-closed-by-user")) {
+    return "Google sign-in popup was closed before completing authentication.";
+  }
+
+  if (message.includes("auth/network-request-failed")) {
+    return "Network error during authentication. Check internet connection and try again.";
+  }
+
+  return message;
+};
 export const loginWithEmailThunk = createAsyncThunk(
   "auth/loginWithEmail",
   async (
@@ -23,10 +44,7 @@ export const loginWithEmailThunk = createAsyncThunk(
       };
       return user;
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue("Login failed");
+      return rejectWithValue(mapAuthErrorMessage(error, "Login failed"));    
     }
   }
 );
@@ -46,10 +64,7 @@ export const registerWithEmailThunk = createAsyncThunk(
       };
       return user;
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue("Registration failed");
+      return rejectWithValue(mapAuthErrorMessage(error, "Registration failed"));    
     }
   }
 );
@@ -63,13 +78,10 @@ export const loginWithGoogleThunk = createAsyncThunk(
         uid: result.user.uid,
         email: result.user.email,
         displayName: result.user.displayName,
-      };
+      };      
       return user;
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue("Google login failed");
+      return rejectWithValue(mapAuthErrorMessage(error, "Google login failed"));
     }
   }
 );
@@ -80,10 +92,7 @@ export const logoutThunk = createAsyncThunk(
     try {
       await logout();
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue("Logout failed");
+      return rejectWithValue(mapAuthErrorMessage(error, "Logout failed"));
     }
   }
 );
